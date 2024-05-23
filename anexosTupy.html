@@ -1,0 +1,92 @@
+<script type="text/javascript">
+    var attachmentFieldName = 'Anexo';
+
+    Sys.Application.add_load(function() {
+        var anexosCount = countAttachments();
+         // POST headers
+        // Get request info based on active archer tab
+        var baseURL = window.location.protocol + '//' + window.location.host + parent.parent.ArcherApp.globals['baseUrl'];
+        // Get CSRF TOKEN
+        var csrfToken = window.sessionStorage.getItem("x-csrf-token");
+        var headers = { 'x-csrf-token': csrfToken };
+        // Content API Url + APP Name
+        apiDataType = 'json' ;
+        var valueExtracted = searchIDInPage();
+        var processedID = parseInt(valueExtracted, 10);
+        // var InputContentApiArray = '{"Control_Self_Assessments_1_Id": 345664,"Quantidade": 77}';
+
+        $.ajax({
+            url: baseURL + '/contentapi/Control_Self_Assessments_1',
+            type: 'POST', // Change to POST method
+            headers: headers, // Custom headers
+            processData: false,
+            contentType: 'application/json,text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            async: true,
+            dataType: apiDataType,
+            data: JSON.stringify({ // Include JSON bodya
+                "Control_Self_Assessments_1_Id": processedID,
+                "Quantidade": anexosCount
+            }),
+            success: function(data, textStatus) {
+                console.log("Passed.");
+            },
+            error: function(xhr, textStatus, error) {
+                // Handle error
+                console.log("Error.");
+            }
+
+        });
+    });
+
+    // Function to count elements based on the ID pattern
+    function countAttachments() {
+        // This regex matches any 'id' that starts with your specified prefix and ends with "__" followed by any digits
+        const normalRegex = /^master_DefaultContent_rts_s9201_ss25385_f25385grid_ctl00__\d+$/;
+        const sensibleRegex = /^master_DefaultContent_rts_s9201_ss25624_f25624grid_ctl00__\d+$/;
+
+        const normalAttID = document.getElementById('master_DefaultContent_rts_s9201_ss25385_f25385grid_ctl00__0');
+        const sensibleAttID = document.getElementById('master_DefaultContent_rts_s9201_ss25624_f25624grid_ctl00__0');
+
+        // Get all <tr> elements
+        const rows = document.querySelectorAll('tr');
+        // Filter the rows to find matches to the regex pattern
+        let count = 0;
+        
+        if (normalAttID && sensibleAttID) {
+            console.log('Both elements exist');
+        } else if (normalAttID) {
+            console.log('Only normal attachment field exists');
+            rows.forEach(row => {
+                if (normalRegex.test(row.id)) {
+                    count++;
+                }
+            });
+        } else if (sensibleAttID) {
+            console.log('Only sensible attachment field exists');
+            rows.forEach(row => {
+            if (sensibleRegex.test(row.id)) {
+                count++;
+                }
+            });
+        } else {
+            console.log('Neither element exists');
+        }
+        console.log("Number of attachments:", count);
+        return count;
+    }
+
+    // Function to search for ID in HTML element after AJAX success
+    function searchIDInPage() {
+      var spanElement = document.getElementById('master_DefaultContent_rts_s1400_f3102c');
+      if (spanElement) {
+          // Normalize the extracted value by converting it to a string
+          var extractedValue = String(spanElement.textContent.trim());
+          console.log("Extracted Value:", extractedValue);
+      } else {
+          console.error("Element not found");
+      }
+      return extractedValue;
+  }
+
+
+</script>
