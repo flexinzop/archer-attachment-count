@@ -45,7 +45,7 @@ Update the following parts of the script to match your environment:
 
 Replace <YourAppAlias> with your application’s alias/path (e.g., Control_Self_Assessments_1).
 
-Payload keys (record id & numeric field)
+- Payload keys (record id & numeric field)
 
 const payload = {
   "<YourAppAlias>_Id": processedID,
@@ -54,37 +54,32 @@ const payload = {
 
 Map <YourAppAlias>_Id to your app’s ID field name and Quantidade to your numeric field.
 
-Record ID selector
+- Record ID selector
 
 // Example (replace with your layout’s element)
 const idEl = document.getElementById('master_DefaultContent_rts_s1400_f3102c');
+
 Change the selector to wherever your layout exposes the record ID.
 
-Attachment grid patterns
+- Attachment grid patterns
 The script detects which attachment field exists and counts matching <tr> IDs using regex.
 Update the regex patterns to match your grid’s generated IDs.
 
-CSRF & base URL
+- CSRF & base URL
 The script reads x-csrf-token from sessionStorage and composes baseURL from the current Archer context.
 Adjust only if your environment stores tokens/URLs differently.
 
-How it Works
-Initialize on load → countAttachments() identifies the correct attachment grid and counts its rows.
+# How it Works
+1. Initialize on load → countAttachments() identifies the correct attachment grid and counts its rows.
+2. Extract record ID from the page (searchIDInPage).
+3. Build request: derive baseURL, read CSRF token, and send a POST to the app’s Content API with { Id, Quantidade }.
+4. Log outcome to the console (success/error).
 
-Extract record ID from the page (searchIDInPage).
-
-Build request: derive baseURL, read CSRF token, and send a POST to the app’s Content API with { Id, Quantidade }.
-
-Log outcome to the console (success/error).
-
-Notes & Limitations
-Selectors/regex are environment-specific: update them to match your Archer layout and grid ID patterns.
-
-Runs in the context of a logged-in session; it does not handle authentication.
-
-Ensure your CSP / page settings allow inline scripts where you embed this code.
-
-Test in a non-production environment before deploying broadly.
+# Notes & Limitations
+- Selectors/regex are environment-specific: update them to match your Archer layout and grid ID patterns.
+- Runs in the context of a logged-in session; it does not handle authentication.
+- Ensure your CSP / page settings allow inline scripts where you embed this code.
+- Test in a non-production environment before deploying broadly.
 
 
   ```js
